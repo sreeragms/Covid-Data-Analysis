@@ -57,7 +57,16 @@ where continent is not null
 group by location
 order by 2 desc
 
+--Table 1
 
+ --Getting death percetage from total cases
+ SELECT SUM(new_cases) as total_cases, SUM(CAST(new_deaths as bigint)) as total_deaths, SUM(CAST(new_deaths as bigint))/SUM(new_cases)*100 as death_percentage
+ FROM covid_deaths
+ WHERE continent IS NOT NULL
+ --GROUP BY date
+ ORDER BY 1,2
+
+--Table 2
 --Grouping by continent
 
 select continent, max(cast(total_deaths as bigint)) as total_deaths
@@ -66,6 +75,34 @@ where continent is not null
 group by continent
 order by 2 desc
 
+Select location, SUM(cast(new_deaths as bigint)) as total_deaths
+From covid_deaths
+--Where location like '%states%'
+Where continent is null 
+and location not in ('World', 'European Union', 'International')
+Group by location
+order by total_deaths desc
+
+--Table 3
+SELECT d.location AS Location, v.population AS Population, MAX(d.total_cases) as HighestInfectionCount,  MAX((d.total_cases/v.population))*100 as PercentPopulationInfected
+FROM covid_deaths d
+JOIN covid_vaccinations v
+ON d.location = v.location 
+AND d.date = v.date
+--Where location like '%states%'
+GROUP BY d.location, v.population
+ORDER BY PercentPopulationInfected DESC
+
+--Table 4
+
+SELECT d.location, v.population,d.date, MAX(total_cases) as HighestInfectionCount,  Max((total_cases/population))*100 as PercentPopulationInfected
+FROM covid_deaths d
+JOIN covid_vaccinations v 
+ON d.location = v.location 
+AND d.date = v.date
+--Where location like '%states%'
+GROUP BY d.location, v.population, d.date
+ORDER BY PercentPopulationInfected DESC
 
 --Group by not continent
 select location, max(cast(total_deaths as bigint)) as total_deaths
@@ -99,6 +136,8 @@ where continent is not null)
  WHERE continent IS NOT NULL
  GROUP BY date
  ORDER BY 1,2
+
+
 
  -- Trying to get the date with maximum death percentage from the previous query using a CTE 
 
